@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "237031142553",
+    "project_id": "geo-taxi-zosi7j",
+    "storage_bucket": "geo-taxi-zosi7j.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:237031142553:android:5149ff4018b5e65f2cb408",
+        "android_client_info": {
+          "package_name": "com.ftap.geotaxi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOZ5Bs_v5NkPGoqJKWh_cGyhr8HDR80Xc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:237031142553:android:08a8528d40059acd2cb408",
+        "android_client_info": {
+          "package_name": "com.mycompany.geotaxi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOZ5Bs_v5NkPGoqJKWh_cGyhr8HDR80Xc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
