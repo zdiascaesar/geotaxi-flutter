@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
+import '../services/user_service.dart';
+import '../services/email_verification_service.dart';
 import 'personal_information_screen.dart';
 import 'dart:async';
 
 class CodeConfirmationScreen extends StatefulWidget {
   final String email;
-  final String verificationCode;
+  final String initialVerificationCode;
   final int userRole;
 
   const CodeConfirmationScreen({
     Key? key,
     required this.email,
-    required this.verificationCode,
+    required this.initialVerificationCode,
     required this.userRole,
   }) : super(key: key);
 
@@ -25,10 +28,13 @@ class _CodeConfirmationScreenState extends State<CodeConfirmationScreen> {
   final List<TextEditingController> _controllers = List.generate(4, (_) => TextEditingController());
   int _timerSeconds = 30;
   Timer? _timer;
+  bool _isLoading = false;
+  late String _currentVerificationCode;
 
   @override
   void initState() {
     super.initState();
+    _currentVerificationCode = widget.initialVerificationCode;
     _startTimer();
   }
 
@@ -107,13 +113,10 @@ class _CodeConfirmationScreenState extends State<CodeConfirmationScreen> {
             if (_timerSeconds == 0)
               ElevatedButton(
                 style: AppTheme.resendCodeButtonStyle,
-                onPressed: () {
-                  setState(() {
-                    _timerSeconds = 30;
-                    _startTimer();
-                  });
-                },
-                child: Text(localizations.resendCode),
+                onPressed: _isLoading ? null : _handleResendCode,
+                child: _isLoading
+                    ? CircularProgressIndicator(color: Colors.white)
+                    : Text(localizations.resendCode),
               ),
             Spacer(),
             GridView.count(
@@ -168,18 +171,82 @@ class _CodeConfirmationScreenState extends State<CodeConfirmationScreen> {
     }
   }
 
-  void _handleConfirm() {
+  Future<void> _handleConfirm() async {
+    final localizations = AppLocalizations.of(context)!;
     String enteredCode = _controllers.map((c) => c.text).join();
-    if (enteredCode == widget.verificationCode) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => PersonalInformationScreen(userRole: widget.userRole),
-        ),
-      );
+    if (enteredCode == _currentVerificationCode) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        // Get the current user
+        User? user = FirebaseAuth.instance.currentUser;
+
+        if (user != null) {
+          // Update email verification status in Firebase Authentication
+          await user.sendEmailVerification();
+
+          // Update user document in Firestore
+          await UserService.updateUser(user.uid, {'emailVerified': true});
+
+          // Navigate to PersonalInformationScreen
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => PersonalInformationScreen(userRole: widget.userRole),
+            ),
+          );
+        } else {
+          throw Exception('User not found');
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error verifying email: $e')),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Incorrect code. Please try again.')),
+        SnackBar(content: Text(localizations.incorrectCode)),
       );
+    }
+  }
+
+  Future<void> _handleResendCode() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      String newVerificationCode = EmailVerificationService.generateVerificationCode();
+      bool emailSent = await EmailVerificationService.sendVerificationEmail(
+        widget.email,
+        newVerificationCode,
+      );
+
+      if (emailSent) {
+        setState(() {
+          _currentVerificationCode = newVerificationCode;
+          _timerSeconds = 30;
+          _startTimer();
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Verification code resent successfully')),
+        );
+      } else {
+        throw Exception('Failed to send verification email');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error resending verification code: $e')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 }

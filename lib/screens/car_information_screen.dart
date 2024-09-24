@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import '../theme/app_theme.dart';
 import '../theme/app_colors.dart';
 import '../services/user_service.dart';
@@ -21,6 +23,7 @@ class _CarInformationScreenState extends State<CarInformationScreen> {
   final _yearController = TextEditingController();
   final _plateNumberController = TextEditingController();
   bool _isLoading = false;
+  File? _licenseImage;
 
   @override
   Widget build(BuildContext context) {
@@ -108,12 +111,23 @@ class _CarInformationScreenState extends State<CarInformationScreen> {
                       },
                     ),
                     const SizedBox(height: 24),
-                    ElevatedButton(
-                      onPressed: () {
-                        // TODO: Implement image upload/capture for driving license
-                      },
+                    OutlinedButton(
+                      onPressed: _pickImage,
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        side: BorderSide(color: AppColors.primary),
+                        backgroundColor: Colors.white,
+                      ),
                       child: Text(l10n.uploadDrivingLicense),
                     ),
+                    if (_licenseImage != null)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Text(
+                          'Driving license uploaded',
+                          style: TextStyle(color: Colors.green),
+                        ),
+                      ),
                     const SizedBox(height: 24),
                     ElevatedButton(
                       style: AppTheme.confirmEmailButtonStyle,
@@ -132,8 +146,26 @@ class _CarInformationScreenState extends State<CarInformationScreen> {
     );
   }
 
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      setState(() {
+        _licenseImage = File(image.path);
+      });
+    }
+  }
+
   Future<void> _handleNext() async {
     if (_formKey.currentState!.validate()) {
+      if (_licenseImage == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Please upload your driving license')),
+        );
+        return;
+      }
+
       setState(() {
         _isLoading = true;
       });
@@ -142,13 +174,16 @@ class _CarInformationScreenState extends State<CarInformationScreen> {
         final user = FirebaseAuth.instance.currentUser;
         if (user != null) {
           final carInfo = {
-            'brand': _brandController.text,
-            'model': _modelController.text,
-            'year': _yearController.text,
-            'plateNumber': _plateNumberController.text,
+            'carBrand': _brandController.text,
+            'carModel': _modelController.text,
+            'carYear': _yearController.text,
+            'carPlateNumber': _plateNumberController.text,
+            'drivingLicenseUploaded': true,
           };
 
-          await UserService.updateUser(user.uid, {'carInfo': carInfo});
+          await UserService.updateUser(user.uid, carInfo);
+
+          // TODO: Implement the actual upload of the driving license image
 
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => HomeScreen()),

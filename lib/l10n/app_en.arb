@@ -56,5 +56,6 @@
   "fieldRequired": "This field is required",
   "invalidYear": "Please enter a valid year",
   "homeScreenWelcome": "Welcome to GeoTaxi!",
-  "register": "Register"
+  "register": "Register",
+  "incorrectCode": "Incorrect code. Please try again."
 }

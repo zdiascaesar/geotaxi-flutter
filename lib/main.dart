@@ -4,9 +4,13 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'screens/language_selection_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/personal_information_screen.dart';
+import 'screens/car_information_screen.dart';
 import 'theme/app_theme.dart';
+import 'services/user_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -72,12 +76,57 @@ class MyApp extends StatelessWidget {
             locale: languageProvider.locale,
             initialRoute: '/',
             routes: {
-              '/': (context) => const LanguageSelectionScreen(),
+              '/': (context) => const ProfileCheckScreen(),
+              '/language': (context) => const LanguageSelectionScreen(),
               '/home': (context) => const HomeScreen(),
+              '/personal_information': (context) => const PersonalInformationScreen(userRole: 0),
+              '/car_information': (context) => const CarInformationScreen(),
             },
           );
         },
       ),
+    );
+  }
+}
+
+class ProfileCheckScreen extends StatelessWidget {
+  const ProfileCheckScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<User?>(
+      future: FirebaseAuth.instance.authStateChanges().first,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasData && snapshot.data != null) {
+          // User is signed in
+          return FutureBuilder<String?>(
+            future: UserService.getNextRequiredScreen(snapshot.data!.uid),
+            builder: (context, screenSnapshot) {
+              if (screenSnapshot.connectionState == ConnectionState.waiting) {
+                return const CircularProgressIndicator();
+              } else if (screenSnapshot.hasData) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  Navigator.of(context).pushReplacementNamed('/${screenSnapshot.data}');
+                });
+                return Container();
+              } else {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  Navigator.of(context).pushReplacementNamed('/home');
+                });
+                return Container();
+              }
+            },
+          );
+        } else {
+          // User is not signed in
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.of(context).pushReplacementNamed('/language');
+          });
+          return Container();
+        }
+      },
     );
   }
 }

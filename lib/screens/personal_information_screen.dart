@@ -133,9 +133,18 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
             'name': _nameController.text,
             'familyName': _familyNameController.text,
             'phoneNumber': _phoneNumberController.text,
+            'role': widget.userRole,
           };
 
-          await UserService.updateUser(user.uid, personalInfo);
+          // Check if the user exists in Firestore
+          final existingUser = await UserService.getUser(user.uid);
+          if (existingUser == null) {
+            // If the user doesn't exist, create a new user document
+            await UserService.createUser(user.uid, personalInfo);
+          } else {
+            // If the user exists, update their information
+            await UserService.updateUser(user.uid, personalInfo);
+          }
 
           if (widget.userRole == 1) { // Driver
             Navigator.of(context).push(

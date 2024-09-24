@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_colors.dart';
 import 'role_selection_screen.dart';
 import 'code_confirmation_screen.dart';
 import '../services/email_verification_service.dart';
+import '../services/user_service.dart';
 
 class RegistrationScreen extends StatefulWidget {
   final UserRole role;
@@ -147,6 +149,18 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       });
 
       try {
+        // Create user account with Firebase Authentication
+        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: _emailController.text,
+          password: _passwordController.text,
+        );
+
+        // Create user document in Firestore
+        await UserService.createUser(userCredential.user!.uid, {
+          'email': _emailController.text,
+          'role': widget.role == UserRole.driver ? 1 : 0,
+        });
+
         print('Generating verification code');
         String verificationCode = EmailVerificationService.generateVerificationCode();
         print('Verification code generated: $verificationCode');
@@ -164,7 +178,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             MaterialPageRoute(
               builder: (context) => CodeConfirmationScreen(
                 email: _emailController.text,
-                verificationCode: verificationCode,
+                initialVerificationCode: verificationCode,
                 userRole: widget.role == UserRole.driver ? 1 : 0,
               ),
             ),
@@ -172,6 +186,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         } else {
           print('Failed to send verification email');
           _showErrorSnackBar('Failed to send verification email. Please try again.');
+        }
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'weak-password') {
+          _showErrorSnackBar('The password provided is too weak.');
+        } else if (e.code == 'email-already-in-use') {
+          _showErrorSnackBar('The account already exists for that email.');
+        } else {
+          _showErrorSnackBar('Error: ${e.message}');
         }
       } catch (e) {
         print('Unexpected error: $e');
