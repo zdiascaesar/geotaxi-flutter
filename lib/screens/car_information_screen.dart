@@ -28,7 +28,7 @@ class _CarInformationScreenState extends State<CarInformationScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -113,11 +113,7 @@ class _CarInformationScreenState extends State<CarInformationScreen> {
                     const SizedBox(height: 24),
                     OutlinedButton(
                       onPressed: _pickImage,
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.primary,
-                        side: BorderSide(color: AppColors.primary),
-                        backgroundColor: Colors.white,
-                      ),
+                      style: AppTheme.outlinedButtonStyle,
                       child: Text(l10n.uploadDrivingLicense),
                     ),
                     if (_licenseImage != null)
@@ -130,7 +126,7 @@ class _CarInformationScreenState extends State<CarInformationScreen> {
                       ),
                     const SizedBox(height: 24),
                     ElevatedButton(
-                      style: AppTheme.confirmEmailButtonStyle,
+                      style: AppTheme.elevatedButtonStyle,
                       onPressed: _isLoading ? null : _handleNext,
                       child: _isLoading
                           ? CircularProgressIndicator(color: Colors.white)
@@ -161,7 +157,7 @@ class _CarInformationScreenState extends State<CarInformationScreen> {
     if (_formKey.currentState!.validate()) {
       if (_licenseImage == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Please upload your driving license')),
+          SnackBar(content: Text(AppLocalizations.of(context).uploadLicenseRequired)),
         );
         return;
       }

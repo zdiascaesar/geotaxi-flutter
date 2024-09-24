@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../theme/app_theme.dart';
+import '../theme/app_colors.dart';
 import 'role_selection_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -19,21 +21,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final localizations = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
     _pages = [
       OnboardingPage(
-        title: localizations.onboarding1Title,
-        description: localizations.onboarding1Description,
+        title: l10n.onboarding1Title,
+        description: l10n.onboarding1Description,
         image: 'lib/assets/location.svg',
       ),
       OnboardingPage(
-        title: localizations.onboarding2Title,
-        description: localizations.onboarding2Description,
+        title: l10n.onboarding2Title,
+        description: l10n.onboarding2Description,
         image: 'lib/assets/payment.svg',
       ),
       OnboardingPage(
-        title: localizations.onboarding3Title,
-        description: localizations.onboarding3Description,
+        title: l10n.onboarding3Title,
+        description: l10n.onboarding3Description,
         image: 'lib/assets/order.svg',
       ),
     ];
@@ -41,12 +43,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
         leading: _currentPage > 0
             ? IconButton(
-                icon: Icon(Icons.arrow_back),
+                icon: Icon(Icons.arrow_back, color: AppColors.textDark),
                 onPressed: () {
                   _pageController.previousPage(
                     duration: Duration(milliseconds: 300),
@@ -86,6 +88,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
+                    style: AppTheme.elevatedButtonStyle,
                     onPressed: () {
                       if (_currentPage == _pages.length - 1) {
                         Navigator.of(context).pushReplacement(
@@ -99,8 +102,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       }
                     },
                     child: Text(_currentPage == _pages.length - 1
-                        ? localizations.getStarted
-                        : localizations.next),
+                        ? l10n.getStarted
+                        : l10n.next),
                   ),
                 ],
               ),
@@ -148,7 +151,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           margin: EdgeInsets.symmetric(horizontal: 4),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: i == _currentPage ? Theme.of(context).primaryColor : Colors.grey,
+            color: i == _currentPage ? AppColors.primary : Colors.grey,
           ),
         ),
       );

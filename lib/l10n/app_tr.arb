@@ -1,6 +1,7 @@
 {
   "appTitle": "GeoTaxi",
   "languageSelectionTitle": "Dil Seçin",
+  "selectLanguage": "Dil seçin",
   "englishLanguage": "İngilizce",
   "russianLanguage": "Rusça",
   "turkishLanguage": "Türkçe",
@@ -22,7 +23,6 @@
   "registrationFor": "Kayıt için",
   "login": "Giriş",
   "loginScreenMessage": "Tekrar hoş geldiniz! Devam etmek için lütfen giriş yapın.",
-  "incorrectCode": "Yanlış kod. Lütfen tekrar deneyin.",
   "email": "E-posta",
   "password": "Şifre",
   "confirmPassword": "Şifreyi Onayla",
@@ -57,5 +57,10 @@
   "fieldRequired": "Bu alan gereklidir",
   "invalidYear": "Lütfen geçerli bir yıl girin",
   "homeScreenWelcome": "GeoTaxi'ye Hoş Geldiniz!",
-  "register": "Kayıt Ol"
+  "register": "Kayıt Ol",
+  "incorrectCode": "Yanlış kod. Lütfen tekrar deneyin.",
+  "loginFailed": "Giriş başarısız. Lütfen kimlik bilgilerinizi kontrol edin ve tekrar deneyin.",
+  "dontHaveAccount": "Hesabınız yok mu?",
+  "signUp": "Kaydol",
+  "uploadLicenseRequired": "Lütfen sürücü belgenizi yükleyin"
 }

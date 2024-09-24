@@ -28,7 +28,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -101,7 +101,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     ),
                     SizedBox(height: 24),
                     ElevatedButton(
-                      style: AppTheme.confirmEmailButtonStyle,
+                      style: AppTheme.elevatedButtonStyle,
                       onPressed: _isLoading ? null : _handleRegistration,
                       child: _isLoading
                           ? SizedBox(

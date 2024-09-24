@@ -1,6 +1,7 @@
 {
   "appTitle": "GeoTaxi",
   "languageSelectionTitle": "Select Language",
+  "selectLanguage": "Select language",
   "englishLanguage": "English",
   "russianLanguage": "Russian",
   "turkishLanguage": "Turkish",
@@ -57,5 +58,9 @@
   "invalidYear": "Please enter a valid year",
   "homeScreenWelcome": "Welcome to GeoTaxi!",
   "register": "Register",
-  "incorrectCode": "Incorrect code. Please try again."
+  "incorrectCode": "Incorrect code. Please try again.",
+  "loginFailed": "Login failed. Please check your credentials and try again.",
+  "dontHaveAccount": "Don't have an account?",
+  "signUp": "Sign Up",
+  "uploadLicenseRequired": "Please upload your driving license"
 }

@@ -34,7 +34,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -104,7 +104,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                     ),
                     SizedBox(height: 24),
                     ElevatedButton(
-                      style: AppTheme.confirmEmailButtonStyle,
+                      style: AppTheme.elevatedButtonStyle,
                       onPressed: _isLoading ? null : _handleNext,
                       child: _isLoading
                           ? CircularProgressIndicator(color: Colors.white)

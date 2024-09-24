@@ -1,6 +1,7 @@
 {
   "appTitle": "GeoTaxi",
   "languageSelectionTitle": "Выберите язык",
+  "selectLanguage": "Выберите язык",
   "englishLanguage": "Английский",
   "russianLanguage": "Русский",
   "turkishLanguage": "Турецкий",
@@ -22,7 +23,6 @@
   "registrationFor": "Регистрация для",
   "login": "Вход",
   "loginScreenMessage": "С возвращением! Пожалуйста, войдите, чтобы продолжить.",
-  "incorrectCode": "Неверный код. Пожалуйста, попробуйте еще раз.",
   "email": "Электронная почта",
   "password": "Пароль",
   "confirmPassword": "Подтвердите пароль",
@@ -57,5 +57,10 @@
   "fieldRequired": "Это поле обязательно для заполнения",
   "invalidYear": "Пожалуйста, введите действительный год",
   "homeScreenWelcome": "Добро пожаловать в GeoTaxi!",
-  "register": "Зарегистрироваться"
+  "register": "Зарегистрироваться",
+  "incorrectCode": "Неверный код. Пожалуйста, попробуйте еще раз.",
+  "loginFailed": "Ошибка входа. Пожалуйста, проверьте ваши учетные данные и попробуйте снова.",
+  "dontHaveAccount": "Нет аккаунта?",
+  "signUp": "Зарегистрироваться",
+  "uploadLicenseRequired": "Пожалуйста, загрузите ваше водительское удостоверение"
 }

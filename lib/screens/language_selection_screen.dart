@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import '../main.dart';
+import '../providers/language_provider.dart';
+import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 import 'onboarding_screen.dart';
 
@@ -10,32 +11,58 @@ class LanguageSelectionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
+    final languageProvider = Provider.of<LanguageProvider>(context);
 
     return Scaffold(
       body: SafeArea(
-        child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 40.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                localizations.languageSelectionTitle,
-                style: Theme.of(context).textTheme.headlineSmall,
+                l10n.languageSelectionTitle,
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 24),
-              _buildLanguageButton(context, localizations.englishLanguage, 'en'),
-              const SizedBox(height: 16),
-              _buildLanguageButton(context, localizations.russianLanguage, 'ru'),
-              const SizedBox(height: 16),
-              _buildLanguageButton(context, localizations.turkishLanguage, 'tr'),
-              const SizedBox(height: 32),
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      LanguageButton(
+                        languageName: 'English',
+                        locale: const Locale('en', ''),
+                        isSelected: languageProvider.currentLocale.languageCode == 'en',
+                        onSelected: (locale) => _updateLanguage(context, locale),
+                      ),
+                      const SizedBox(height: 20),
+                      LanguageButton(
+                        languageName: 'Русский',
+                        locale: const Locale('ru', ''),
+                        isSelected: languageProvider.currentLocale.languageCode == 'ru',
+                        onSelected: (locale) => _updateLanguage(context, locale),
+                      ),
+                      const SizedBox(height: 20),
+                      LanguageButton(
+                        languageName: 'Türkçe',
+                        locale: const Locale('tr', ''),
+                        isSelected: languageProvider.currentLocale.languageCode == 'tr',
+                        onSelected: (locale) => _updateLanguage(context, locale),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               ElevatedButton(
+                style: AppTheme.elevatedButtonStyle,
                 onPressed: () {
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(builder: (context) => const OnboardingScreen()),
                   );
                 },
-                child: Text(localizations.continueButton),
+                child: Text(l10n.continueButton),
               ),
             ],
           ),
@@ -44,24 +71,44 @@ class LanguageSelectionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLanguageButton(BuildContext context, String languageName, String languageCode) {
-    final languageProvider = Provider.of<LanguageProvider>(context);
-    final isSelected = languageProvider.locale.languageCode == languageCode;
+  void _updateLanguage(BuildContext context, Locale locale) {
+    final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
+    languageProvider.setLocale(locale);
+  }
+}
 
+class LanguageButton extends StatelessWidget {
+  final String languageName;
+  final Locale locale;
+  final bool isSelected;
+  final Function(Locale) onSelected;
+
+  const LanguageButton({
+    Key? key,
+    required this.languageName,
+    required this.locale,
+    required this.isSelected,
+    required this.onSelected,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return SizedBox(
       width: 160,
       height: 42,
       child: ElevatedButton(
-        onPressed: () => _changeLanguage(context, languageCode),
-        style: AppTheme.languageButtonStyle(isSelected: isSelected),
-        child: Text(languageName),
+        style: isSelected
+            ? AppTheme.elevatedButtonStyle
+            : AppTheme.outlinedButtonStyle,
+        onPressed: () => onSelected(locale),
+        child: Text(
+          languageName,
+          style: TextStyle(
+            fontSize: 18,
+            color: isSelected ? AppColors.textLight : AppColors.primary,
+          ),
+        ),
       ),
     );
-  }
-
-  void _changeLanguage(BuildContext context, String languageCode) {
-    final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
-    languageProvider.setLocale(Locale(languageCode));
-    languageProvider.saveLanguage(languageCode);
   }
 }

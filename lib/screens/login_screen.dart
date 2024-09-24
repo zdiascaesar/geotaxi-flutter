@@ -3,20 +3,25 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../theme/app_colors.dart';
+import '../theme/app_theme.dart';
 import 'role_selection_screen.dart';
 import 'home_screen.dart';
+import '../services/user_service.dart';
+import 'personal_information_screen.dart';
+import 'car_information_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -25,28 +30,68 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _login() {
+  Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
-      // TODO: Implement actual login functionality
-      print('Login with: ${_emailController.text} / ${_passwordController.text}');
-      
-      // Navigate to HomeScreen after successful login
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => HomeScreen()),
+      setState(() {
+        _isLoading = true;
+      });
+
+      final user = await UserService.loginUser(
+        _emailController.text,
+        _passwordController.text,
       );
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (!mounted) return;
+
+      if (user != null) {
+        final nextScreen = await UserService.getNextRequiredScreen(user.uid);
+        if (!mounted) return;
+        
+        if (nextScreen != null) {
+          switch (nextScreen) {
+            case 'personal_information':
+              final userRole = await UserService.getUserRole(user.uid);
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: (context) => PersonalInformationScreen(userRole: userRole),
+              ));
+              break;
+            case 'car_information':
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: (context) => const CarInformationScreen(),
+              ));
+              break;
+            default:
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: (context) => const HomeScreen(),
+              ));
+          }
+        } else {
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (context) => const HomeScreen(),
+          ));
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context).loginFailed)),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppColors.textDark),
+          icon: const Icon(Icons.arrow_back, color: AppColors.textDark),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text(localizations.login, style: TextStyle(color: AppColors.textDark)),
+        title: Text(l10n.login, style: const TextStyle(color: AppColors.textDark)),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -67,13 +112,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
-                    labelText: localizations.email,
-                    border: OutlineInputBorder(),
+                    labelText: l10n.email,
+                    border: const OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return localizations.pleaseEnterEmail;
+                      return l10n.pleaseEnterEmail;
                     }
                     return null;
                   },
@@ -82,44 +127,39 @@ class _LoginScreenState extends State<LoginScreen> {
                 TextFormField(
                   controller: _passwordController,
                   decoration: InputDecoration(
-                    labelText: localizations.password,
-                    border: OutlineInputBorder(),
+                    labelText: l10n.password,
+                    border: const OutlineInputBorder(),
                   ),
                   obscureText: true,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return localizations.pleaseEnterPassword;
+                      return l10n.pleaseEnterPassword;
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: _login,
-                  child: Text(localizations.login),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.textLight,
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                  ),
+                  onPressed: _isLoading ? null : _login,
+                  style: AppTheme.elevatedButtonStyle,
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: AppColors.textLight)
+                      : Text(l10n.login),
                 ),
                 const SizedBox(height: 16),
                 RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
-                    style: TextStyle(color: AppColors.textDark),
+                    style: AppTheme.richTextStyle,
                     children: [
-                      TextSpan(text: "${localizations.alreadyHaveAccount} "),
+                      TextSpan(text: "${l10n.dontHaveAccount} "),
                       TextSpan(
-                        text: localizations.register,
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        text: l10n.signUp,
+                        style: AppTheme.richTextLinkStyle,
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
                             Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => RoleSelectionScreen(),
+                              builder: (context) => const RoleSelectionScreen(),
                             ));
                           },
                       ),

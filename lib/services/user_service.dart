@@ -1,7 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class UserService {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  static Future<User?> loginUser(String email, String password) async {
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return userCredential.user;
+    } on FirebaseAuthException catch (e) {
+      print('Failed to login: ${e.message}');
+      return null;
+    }
+  }
 
   static Future<void> createUser(String uid, Map<String, dynamic> userData) async {
     await _firestore.collection('users').doc(uid).set(userData);
@@ -48,5 +63,10 @@ class UserService {
     }
 
     return null; // All required information is complete
+  }
+
+  static Future<int> getUserRole(String uid) async {
+    Map<String, dynamic>? userData = await getUser(uid);
+    return userData?['role'] ?? 0; // Default to 0 (passenger) if role is not set
   }
 }

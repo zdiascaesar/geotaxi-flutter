@@ -6,17 +6,13 @@ class AppTheme {
     primaryColor: AppColors.primary,
     scaffoldBackgroundColor: AppColors.background,
     elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        foregroundColor: AppColors.textLight,
-        backgroundColor: AppColors.primary,
-        minimumSize: const Size(160, 42),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(6),
-        ),
-      ),
+      style: elevatedButtonStyle,
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: outlinedButtonStyle,
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: textButtonStyle,
     ),
     inputDecorationTheme: InputDecorationTheme(
       border: OutlineInputBorder(
@@ -35,36 +31,39 @@ class AppTheme {
     ),
   );
 
-  static ButtonStyle languageButtonStyle({required bool isSelected}) {
-    return isSelected
-        ? ElevatedButton.styleFrom(
-            foregroundColor: AppColors.textLight,
-            backgroundColor: AppColors.primary,
-            minimumSize: const Size(160, 42),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(6),
-            ),
-          )
-        : outlinedButtonStyle;
-  }
-
-  static final ButtonStyle outlinedButtonStyle = OutlinedButton.styleFrom(
-    foregroundColor: AppColors.textDark,
-    backgroundColor: AppColors.background,
-    minimumSize: const Size(160, 42),
-    side: BorderSide(color: AppColors.border, width: 2),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(6),
-    ),
-  );
-
-  static final ButtonStyle confirmEmailButtonStyle = ElevatedButton.styleFrom(
+  static final ButtonStyle elevatedButtonStyle = ElevatedButton.styleFrom(
     foregroundColor: AppColors.textLight,
     backgroundColor: AppColors.primary,
-    minimumSize: const Size(double.infinity, 48),
+    minimumSize: const Size(160, 42),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(6),
     ),
+    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+  );
+
+  static final ButtonStyle outlinedButtonStyle = OutlinedButton.styleFrom(
+    foregroundColor: AppColors.primary,
+    backgroundColor: Colors.white,
+    minimumSize: const Size(160, 42),
+    side: BorderSide(color: AppColors.primary, width: 2),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(6),
+    ),
+    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+  );
+
+  static final ButtonStyle textButtonStyle = TextButton.styleFrom(
+    foregroundColor: AppColors.primary,
+    minimumSize: const Size(160, 42),
+    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+  );
+
+  static ButtonStyle languageButtonStyle({required bool isSelected}) {
+    return isSelected ? elevatedButtonStyle : outlinedButtonStyle;
+  }
+
+  static final ButtonStyle confirmEmailButtonStyle = elevatedButtonStyle.copyWith(
+    minimumSize: MaterialStateProperty.all(Size(double.infinity, 42)),
   );
 
   static const TextStyle richTextStyle = TextStyle(
@@ -108,12 +107,5 @@ class AppTheme {
     color: AppColors.textDark,
   );
 
-  static final ButtonStyle resendCodeButtonStyle = ElevatedButton.styleFrom(
-    foregroundColor: AppColors.textLight,
-    backgroundColor: AppColors.primary,
-    minimumSize: const Size(160, 42),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(6),
-    ),
-  );
+  static final ButtonStyle resendCodeButtonStyle = elevatedButtonStyle;
 }

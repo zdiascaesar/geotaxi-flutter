@@ -59,7 +59,7 @@ class _CodeConfirmationScreenState extends State<CodeConfirmationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -112,7 +112,7 @@ class _CodeConfirmationScreenState extends State<CodeConfirmationScreen> {
             SizedBox(height: 16),
             if (_timerSeconds == 0)
               ElevatedButton(
-                style: AppTheme.resendCodeButtonStyle,
+                style: AppTheme.elevatedButtonStyle,
                 onPressed: _isLoading ? null : _handleResendCode,
                 child: _isLoading
                     ? CircularProgressIndicator(color: Colors.white)
@@ -172,7 +172,7 @@ class _CodeConfirmationScreenState extends State<CodeConfirmationScreen> {
   }
 
   Future<void> _handleConfirm() async {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = AppLocalizations.of(context);
     String enteredCode = _controllers.map((c) => c.text).join();
     if (enteredCode == _currentVerificationCode) {
       setState(() {

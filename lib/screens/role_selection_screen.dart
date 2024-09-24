@@ -16,7 +16,7 @@ class RoleSelectionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -60,11 +60,13 @@ class RoleSelectionScreen extends StatelessWidget {
                   const SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: () => _navigateToRegistration(context, UserRole.passenger),
+                    style: AppTheme.elevatedButtonStyle,
                     child: Text(localizations.iAmPassenger),
                   ),
                   const SizedBox(height: 40),
                   TextButton(
                     onPressed: () => _navigateToLogin(context),
+                    style: AppTheme.textButtonStyle,
                     child: Text(localizations.alreadyHaveAccount),
                   ),
                 ],
